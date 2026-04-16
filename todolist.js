@@ -24,10 +24,31 @@ const todoList = () => {
   }
 
   // Complete todo item
-  const completeTodo = () => {}
+  const completeTodo = (id) => {
+    const todoToBeCompleted = todoArr.find((todo) => todo.id == id)
+
+    // I praktiken en togglefunktion som togglar true och false. Ändrar till det den inte är från början.
+    todoToBeCompleted.completed = !todoToBeCompleted.completed
+
+    saveTodos()
+
+    renderTodos()
+  }
 
   // Delete todo item
-  const deleteTodo = () => {}
+  const deleteTodo = (id) => {
+    // Skapa ny lista utan det borttagna todo
+    const listWithoutDeletedTodo = todoArr.filter((todo) => todo.id !== id)
+
+    //Sätt arrayen till den nya listan
+    todoArr = listWithoutDeletedTodo
+
+    // spara nya listan i local storage
+    saveTodos()
+
+    // Rendera nya listan
+    renderTodos()
+  }
 
   // Funktion för att skriva ut todo till DOM
   const addTodoToDOM = (value) => {
@@ -51,8 +72,34 @@ const todoList = () => {
     todoList.innerHTML = ""
 
     todoArr.forEach((todo) => {
+      // Skapa ett tomt listelement
       const todoItemElement = document.createElement("li")
-      todoItemElement.innerHTML = todo.task
+
+      // Sätt todo-objektets id som dataattribut
+      todoItemElement.dataset.id = todo.id
+
+      //sätta klassen completed om det är avklarat
+      if (todo.completed) {
+        todoItemElement.classList.add("completed")
+      }
+
+      // Sätt information i det skapade listelementet
+      todoItemElement.innerHTML = `
+      <span>${todo.task}</span>
+      <button class="delete">Delete</button>
+      `
+
+      // Event för att ta hand om complete när man klickar på span i det skapade elementet
+      todoItemElement
+        .querySelector("span")
+        .addEventListener("click", () => completeTodo(todo.id))
+
+      //Event för delete-knapp
+      todoItemElement
+        .querySelector(".delete")
+        .addEventListener("click", () => deleteTodo(todo.id))
+
+      // Lägg till elementet i listan
       todoList.append(todoItemElement)
     })
   }
